@@ -1,0 +1,10 @@
+[
+  {
+    "name": "people",
+    "fields": {
+      "name": "string",
+      "birthday": "float",
+      "phone": "string"
+    }
+  }
+]
