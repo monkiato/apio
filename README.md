@@ -22,7 +22,7 @@ expected fields per collection:
 
 e.g.
 
-```
+```go
 [
   {
     "name": "books",
@@ -35,6 +35,15 @@ e.g.
   },
   ... // more collections
 ]
+```
+
+Available endpoints will be:
+
+```go
+GET     http://myurl.com/api/books/{id}
+PUT     http://myurl.com/api/books/
+POST    http://myurl.com/api/books/{id}
+DELETE  http://myurl.com/api/books/{id}
 ```
 
 A sample file can be found in *manifest.sample.json*
