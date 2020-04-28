@@ -16,7 +16,7 @@ type MemoryStorage struct {
 	collectionHandlers     map[string]CollectionHandler
 }
 
-type MemoryCollection struct {
+type MemoryCollectionHandler struct {
 	collection collectionData
 	lastId     int64
 }
@@ -28,27 +28,27 @@ func NewMemoryStorage() Storage {
 	}
 }
 
-func newMemoryStorageCollection(collection collectionData) CollectionHandler {
-	return &MemoryCollection{
+func newMemoryStorageCollectionHandler(collection collectionData) CollectionHandler {
+	return &MemoryCollectionHandler{
 		collection: collection,
 	}
 }
 
-func (msc *MemoryCollection) GetItem(itemId string) (interface{}, bool) {
+func (msc *MemoryCollectionHandler) GetItem(itemId string) (interface{}, bool) {
 	if data, ok := msc.collection[itemId]; ok {
 		return data, true
 	}
 	return nil, false
 }
 
-func (msc *MemoryCollection) AddItem(item map[string]interface{}) (string, error) {
+func (msc *MemoryCollectionHandler) AddItem(item map[string]interface{}) (string, error) {
 	msc.lastId++
 	id := strconv.FormatInt(msc.lastId, 16)
 	msc.collection[id] = item
 	return id, nil
 }
 
-func (msc *MemoryCollection) UpdateItem(itemId string, newItem map[string]interface{}) error {
+func (msc *MemoryCollectionHandler) UpdateItem(itemId string, newItem map[string]interface{}) error {
 	_, found := msc.GetItem(itemId)
 	if !found {
 		return fmt.Errorf("item '%s' not found", itemId)
@@ -57,7 +57,7 @@ func (msc *MemoryCollection) UpdateItem(itemId string, newItem map[string]interf
 	return nil
 }
 
-func (msc *MemoryCollection) DeleteItem(itemId string) error {
+func (msc *MemoryCollectionHandler) DeleteItem(itemId string) error {
 	_, found := msc.GetItem(itemId)
 	if !found {
 		return fmt.Errorf("item '%s' not found", itemId)
@@ -79,7 +79,7 @@ func (ms *MemoryStorage) GetCollection(collectionName string) (CollectionHandler
 	if collection, ok := ms.dataCollections[collectionName]; ok {
 		storageCollection, exists := ms.collectionHandlers[collectionName]
 		if !exists {
-			storageCollection = newMemoryStorageCollection(collection)
+			storageCollection = newMemoryStorageCollectionHandler(collection)
 			ms.collectionHandlers[collectionName] = storageCollection
 		}
 		return storageCollection, nil
