@@ -61,7 +61,7 @@ A sample file can be found in *manifest.sample.json*
 
 No extra parameters are required for the docker image, so just run:
 
-`docker build . -t apio-seriver`
+`docker build . -t apio-server`
 
 ## Run Docker Container
 
