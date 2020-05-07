@@ -1,6 +1,6 @@
 package server
 
-import "rodrigocollavo/apio/internal/storage"
+import "monkiato/apio/internal/storage"
 
 var (
 	Storage storage.Storage

@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . .
 
 RUN go mod download
-RUN go build ./...
+RUN go build -o apio .
 
 FROM alpine:3.9.6 AS server
 

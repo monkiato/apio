@@ -1,6 +1,6 @@
-module rodrigocollavo/apio
+module monkiato/apio
 
-go 1.15
+go 1.13
 
 require (
 	github.com/gorilla/context v1.1.1

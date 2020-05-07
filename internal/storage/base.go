@@ -1,6 +1,6 @@
 package storage
 
-import "rodrigocollavo/apio/internal/data"
+import "monkiato/apio/internal/data"
 
 // Storage handles data for multiple collections, it's the main entry points to initialize and manage all API collections
 type Storage interface {
