@@ -1,3 +1,6 @@
+[![Build Status](https://drone.monkiato.com/api/badges/monkiato/apio/status.svg?ref=refs/heads/master)](https://drone.monkiato.com/monkiato/apio)
+
+
 # Apio
 
 A dynamic REST API server, using a manifest file to specify available collections
