@@ -66,6 +66,10 @@ func (msc *MemoryCollectionHandler) DeleteItem(itemId string) error {
 	return nil
 }
 
+func (msc *MemoryCollectionHandler) List(lastItemId string) []interface{} {
+	return nil
+}
+
 func (ms *MemoryStorage) Initialize(manifest string) {
 	ms.initializeCollectionDefinitions(manifest)
 	ms.initializeCollections()

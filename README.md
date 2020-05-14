@@ -19,8 +19,10 @@ A dynamic REST API server, using a manifest file to specify available collection
 
 the manifest is a json formatted file with a list of collections to be populated in the API.
 
+The default path is `/app/manifest.json`, or can be changed through the environment variable `MANIFEST_PATH`
 
 expected fields per collection:
+
  - name: collection name used for the url
  - fields: list of field names and types to be used
 
@@ -62,22 +64,33 @@ A sample file can be found in *manifest.sample.json*
  
 ## Build Docker Image
 
-No extra parameters are required for the docker image, so just run:
+Create Docker Image:
 
 `docker build . -t apio-server`
 
+
 ## Run Docker Container
 
-Use Dockerfile and update manifest.json path if necessary
+An example is available in docker-compose.yml 
 
-TBD
+A MongoDB is required for the default storage mode
+
+Custom environment arguments:
+
+    MONGODB_HOST: "{host}:{port}"   //default localhost:27017
+    MONGODB_NAME: {db_name}         //default 'apio'
+    MANIFEST_PATH: {custom}         //default /app/manifest.json
+    DEBUG_MODE: 1                   //default 0, enable verbose logs
+
+A volume mapping is required in order to provide the manifest file:
+
+    volumes:
+      - "{your-local-path}:/app/manifest.json"
 
 ## TODOs
 
- - custom manifest.json path
  - Endpoint for listing collection items (paginated?)
  - Add more validations to prevent creating same item multiple time through same request
- - Review if validations are required to prevent deleting item unintentional
- - Add more logs
+ - Review if validations required to prevent deleting item unintentional
  - Unit tests
  - Stress tests (concurrency for collections)

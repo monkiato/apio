@@ -22,4 +22,6 @@ type CollectionHandler interface {
 	UpdateItem(itemId string, item map[string]interface{})  error
 	// DeleteItem remove the specified itemId
 	DeleteItem(itemId string)  error
+	// List returns a list of items from a collection, limited by page and amount of items
+	List(lastItemId string) []interface{}
 }

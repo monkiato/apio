@@ -4,26 +4,29 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
 	"monkiato/apio/internal/data"
+	"os"
 	"time"
 )
 
 const (
-	mongodbHost     = "mongodb://localhost:32771"
-	mongodbName		= "default"
+	defaultMongodbHost     = "localhost:27017"
+	defaultMongodbName		= "apio"
 )
 
 type MongoStorage struct {
-	collectionsDefinitions []data.CollectionDefinition
+	collectionsDefinitions    []data.CollectionDefinition
 	collectionsDefinitionsMap map[string]data.CollectionDefinition
-	collectionHandlers     map[string]CollectionHandler
-	client                     *mongo.Client
+	collectionHandlers        map[string]CollectionHandler
+	client                    *mongo.Client
+	host                      string
+	dbName                    string
 }
 
 type MongoCollectionHandler struct {
@@ -32,9 +35,19 @@ type MongoCollectionHandler struct {
 }
 
 func NewMongoStorage() Storage {
+	host := defaultMongodbHost
+	dbName := defaultMongodbName
+	if envHost, exists := os.LookupEnv("MONGODB_HOST"); exists {
+		host = envHost
+	}
+	if envDbName, exists := os.LookupEnv("MONGODB_NAME"); exists {
+		dbName = envDbName
+	}
 	return &MongoStorage{
 		collectionHandlers: map[string]CollectionHandler{},
 		collectionsDefinitionsMap: map[string]data.CollectionDefinition{},
+		host: host,
+		dbName: dbName,
 	}
 }
 
@@ -81,6 +94,7 @@ func (msc *MongoCollectionHandler) AddItem(item map[string]interface{}) (string,
 		return "", nil
 	}
 	id := res.InsertedID.(primitive.ObjectID).Hex()
+	log.Debugf("created new item %s.%s", msc.collection.Name, id)
 	return id, nil
 }
 
@@ -91,6 +105,7 @@ func (msc *MongoCollectionHandler) UpdateItem(itemId string, newItem map[string]
 		fmt.Printf("unable to update item. err: " + err.Error())
 		return err
 	}
+	log.Debugf("updated item %s.%s", msc.collection.Name, itemId)
 	return nil
 }
 
@@ -101,18 +116,26 @@ func (msc *MongoCollectionHandler) DeleteItem(itemId string) error {
 		fmt.Printf("unable to delete item. err: " + err.Error())
 		return err
 	}
+	log.Debugf("deleted item %s.%s", msc.collection.Name, itemId)
+	return nil
+}
+
+func (msc *MongoCollectionHandler) List(lastItemId string) []interface{} {
 	return nil
 }
 
 func (ms *MongoStorage) Initialize(manifest string) {
 	ctx := createContext()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongodbHost))
+	uri := fmt.Sprintf("mongodb://%s", ms.host)
+
+	log.Debugf("connecting to mongoDB: %s", uri)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		panic("unable to connect to Mongo db. " + mongodbHost)
+		panic("unable to connect to Mongo db. " + uri)
 	}
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		panic("Mongo db server not found at " + mongodbHost)
+		panic("Mongo db server not found at " + uri)
 	}
 	ms.client = client
 
@@ -133,7 +156,7 @@ func (ms *MongoStorage) GetCollection(collectionName string) (CollectionHandler,
 	if collection, ok := ms.collectionsDefinitionsMap[collectionName]; ok {
 		collectionHandler, exists := ms.collectionHandlers[collectionName]
 		if !exists {
-			collectionHandler = newMongoStorageCollectionHandler(ms.client.Database(mongodbName), collection)
+			collectionHandler = newMongoStorageCollectionHandler(ms.client.Database(ms.dbName), collection)
 			ms.collectionHandlers[collectionName] = collectionHandler
 		}
 		return collectionHandler, nil
@@ -142,10 +165,12 @@ func (ms *MongoStorage) GetCollection(collectionName string) (CollectionHandler,
 }
 
 func (ms *MongoStorage) initializeCollectionDefinitions(manifest string) {
+	log.Debugf("parsing manifest...")
 	err := json.Unmarshal([]byte(manifest), &ms.collectionsDefinitions)
 	if err != nil {
 		log.Fatal("Unable to parse manifest")
 	}
+	log.Debugf("manifest parsed successfully")
 }
 
 func (ms *MongoStorage) initializeCollections() {

@@ -2,12 +2,11 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/context"
-	"net/http"
+	log "github.com/sirupsen/logrus"
 	"monkiato/apio/internal/data"
+	"net/http"
 )
-
 
 // GetHandler used to handle GET requests, the collectionDefinition is provided based on the endpoint being called
 func GetHandler(collectionDefinition data.CollectionDefinition) func(http.ResponseWriter, *http.Request) {
@@ -16,7 +15,7 @@ func GetHandler(collectionDefinition data.CollectionDefinition) func(http.Respon
 		item := context.Get(r, "item")
 		data, err := json.Marshal(item)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "unable to parse item data")
 			return
 		}
@@ -37,7 +36,7 @@ func PutHandler(collectionDefinition data.CollectionDefinition) func(http.Respon
 			return
 		}
 		if id, err := storageCollection.AddItem(item); err != nil {
-			fmt.Println(err.Error())
+			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't add new item")
 			return
 		} else {
@@ -57,7 +56,7 @@ func PostHandler(collectionDefinition data.CollectionDefinition) func(http.Respo
 
 		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
 		if err := storageCollection.UpdateItem(id, newItem); err != nil {
-			fmt.Println(err.Error())
+			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't update item")
 			return
 		} else {
@@ -75,11 +74,29 @@ func DeleteHandler(collectionDefinition data.CollectionDefinition) func(http.Res
 		id := context.Get(r, "id").(string)
 		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
 		if err := storageCollection.DeleteItem(id); err != nil {
-			fmt.Println(err.Error())
+			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't delete item")
 			return
 		} else {
 			w.WriteHeader(http.StatusNoContent)
 		}
+	}
+}
+
+// ListCollectionHandler used to get a list of items in the collection using pagination
+func ListCollectionHandler(collectionDefinition data.CollectionDefinition) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		queryParams := r.URL.Query()
+		lastValue := queryParams.Get("last")
+		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
+		items := storageCollection.List(lastValue)
+		data, err := json.Marshal(items)
+		if err != nil {
+			log.Error(err.Error())
+			addErrorResponse(w, http.StatusInternalServerError, "unable to parse items list data")
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
 	}
 }

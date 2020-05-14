@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  apio:
+    build: .
+    volumes:
+      - "./manifest.sample.json:/app/manifest.json"
+    environment:
+      MONGODB_HOST: "mongodb:27017"
+      MONGODB_NAME: apio
+      DEBUG_MODE: 1
+    depends_on:
+      - mongodb
+    ports:
+      - 8000:80
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: apio
