@@ -86,11 +86,3 @@ A volume mapping is required in order to provide the manifest file:
 
     volumes:
       - "{your-local-path}:/app/manifest.json"
-
-## TODOs
-
- - Endpoint for listing collection items (paginated?)
- - Add more validations to prevent creating same item multiple time through same request
- - Review if validations required to prevent deleting item unintentional
- - Unit tests
- - Stress tests (concurrency for collections)
