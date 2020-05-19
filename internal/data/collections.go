@@ -7,8 +7,8 @@ import (
 
 // CollectionDefinition contains the main name structure for a rest API collection
 type CollectionDefinition struct {
-	Name string `json:"name"`
-	Fields map[string]string  `json:"fields"`
+	Name   string            `json:"name"`
+	Fields map[string]string `json:"fields"`
 }
 
 // IsDataValid check if the specified item map contains valid structure and field types based on the collection definition
@@ -32,4 +32,3 @@ func (cd CollectionDefinition) isFieldTypeValid(name string, value interface{}) 
 	valueType := fmt.Sprintf("%T", value)
 	return strings.Contains(valueType, definitionType)
 }
-

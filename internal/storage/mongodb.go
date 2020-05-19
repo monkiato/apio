@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	defaultMongodbHost     = "localhost:27017"
-	defaultMongodbName		= "apio"
+	defaultMongodbHost = "localhost:27017"
+	defaultMongodbName = "apio"
 )
 
 type MongoStorage struct {
@@ -30,8 +30,8 @@ type MongoStorage struct {
 }
 
 type MongoCollectionHandler struct {
-	db         		*mongo.Database
-	collection 		data.CollectionDefinition
+	db         *mongo.Database
+	collection data.CollectionDefinition
 }
 
 func NewMongoStorage() Storage {
@@ -44,16 +44,16 @@ func NewMongoStorage() Storage {
 		dbName = envDbName
 	}
 	return &MongoStorage{
-		collectionHandlers: map[string]CollectionHandler{},
+		collectionHandlers:        map[string]CollectionHandler{},
 		collectionsDefinitionsMap: map[string]data.CollectionDefinition{},
-		host: host,
-		dbName: dbName,
+		host:                      host,
+		dbName:                    dbName,
 	}
 }
 
 func newMongoStorageCollectionHandler(db *mongo.Database, collection data.CollectionDefinition) CollectionHandler {
 	return &MongoCollectionHandler{
-		db: db,
+		db:         db,
 		collection: collection,
 	}
 }
@@ -63,7 +63,7 @@ func (msc *MongoCollectionHandler) GetItem(itemId string) (interface{}, bool) {
 	// fetch item
 	res := msc.db.Collection(msc.collection.Name).
 		FindOne(
-		createContext(),
+			createContext(),
 			bson.M{"_id": objId},
 			options.FindOne().SetProjection(bson.D{{"_id", 0}}))
 

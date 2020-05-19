@@ -36,8 +36,8 @@ func main() {
 	addAPIRoutes(mainRoute)
 
 	srv := &http.Server{
-		Handler:      mainRoute,
-		Addr:         fmt.Sprintf(":%s", port),
+		Handler: mainRoute,
+		Addr:    fmt.Sprintf(":%s", port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

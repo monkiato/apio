@@ -5,8 +5,8 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"io/ioutil"
-	"net/http"
 	"monkiato/apio/internal/data"
+	"net/http"
 )
 
 // ParseBody middleware used to apply a JSON parse for the request body. Data will be stored in Gorilla Context
@@ -41,7 +41,7 @@ func ValidateId(collection data.CollectionDefinition) mux.MiddlewareFunc {
 			// collection validation
 			collection, error := Storage.GetCollection(collection.Name)
 			if error != nil {
-				addErrorResponse(w, http.StatusBadRequest, "can't fetch collection. error: " + error.Error())
+				addErrorResponse(w, http.StatusBadRequest, "can't fetch collection. error: "+error.Error())
 				return
 			}
 
