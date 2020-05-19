@@ -21,7 +21,22 @@
         files:
           - coverage.txt
 
+    - name: publish
+      image: plugins/docker
+      settings:
+        repo: docker.pkg.github.com/monkiato/apio/apio
+        registry: docker.pkg.github.com
+        tags: ${DRONE_TAG}
+        username:
+          from_secret: docker_username
+        password:
+          from_secret: docker_password
+      when:
+        event:
+          - tag
+
 trigger:
   ref:
     - refs/heads/master
     - refs/pull/*/head
+    - refs/tags/*
