@@ -82,7 +82,7 @@ func addAPIRoutes(router *mux.Router) {
 	for _, collection := range server.Storage.GetCollectionDefinitions() {
 		log.Debugf("adding routes for collection '%s'", collection.Name)
 		apiRoute := router.PathPrefix(fmt.Sprintf("/%s/", collection.Name)).Subrouter()
-		apiRoute.Use(server.ValidateId(collection))
+		apiRoute.Use(server.ValidateID(collection))
 		apiRoute.HandleFunc("/{id}", server.GetHandler(collection)).Methods(http.MethodGet)
 		apiRoute.HandleFunc("/", server.ParseBody(server.PutHandler(collection))).Methods(http.MethodPut)
 		apiRoute.HandleFunc("/{id}", server.ParseBody(server.PostHandler(collection))).Methods(http.MethodPost)

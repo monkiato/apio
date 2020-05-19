@@ -15,13 +15,13 @@ type Storage interface {
 // CollectionHandler used to operate over a single collection
 type CollectionHandler interface {
 	// GetItem get a collection item for the specified item ID
-	GetItem(itemId string) (interface{}, bool)
-	// AddItem insert new item. (itemId, error) is returned
+	GetItem(itemID string) (interface{}, bool)
+	// AddItem insert new item. (itemID, error) is returned
 	AddItem(item map[string]interface{}) (string, error)
 	// UpdateItem used to update an existing item, it must exists previously, otherwise an error will be returned
-	UpdateItem(itemId string, item map[string]interface{}) error
-	// DeleteItem remove the specified itemId
-	DeleteItem(itemId string) error
+	UpdateItem(itemID string, item map[string]interface{}) error
+	// DeleteItem remove the specified itemID
+	DeleteItem(itemID string) error
 	// List returns a list of items from a collection, limited by page and amount of items
-	List(lastItemId string) []interface{}
+	List(lastItemID string) []interface{}
 }

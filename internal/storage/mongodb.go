@@ -20,6 +20,7 @@ const (
 	defaultMongodbName = "apio"
 )
 
+//MongoStorage structure for the storage using a MongoDB
 type MongoStorage struct {
 	collectionsDefinitions    []data.CollectionDefinition
 	collectionsDefinitionsMap map[string]data.CollectionDefinition
@@ -29,11 +30,15 @@ type MongoStorage struct {
 	dbName                    string
 }
 
+//MongoCollectionHandler  data handler used for a specific collection
 type MongoCollectionHandler struct {
 	db         *mongo.Database
 	collection data.CollectionDefinition
 }
 
+//NewMongoStorage create a new MongoStorage instance
+//MongoDB connection data con be set by environment variables
+//MONGODB_HOST and MONGODB_NAME
 func NewMongoStorage() Storage {
 	host := defaultMongodbHost
 	dbName := defaultMongodbName
@@ -58,25 +63,26 @@ func newMongoStorageCollectionHandler(db *mongo.Database, collection data.Collec
 	}
 }
 
-func (msc *MongoCollectionHandler) GetItem(itemId string) (interface{}, bool) {
-	objId, _ := primitive.ObjectIDFromHex(itemId)
+//GetItem implements storage.CollectionHandler.GetItem
+func (msc *MongoCollectionHandler) GetItem(itemID string) (interface{}, bool) {
+	objID, _ := primitive.ObjectIDFromHex(itemID)
 	// fetch item
 	res := msc.db.Collection(msc.collection.Name).
 		FindOne(
 			createContext(),
-			bson.M{"_id": objId},
+			bson.M{"_id": objID},
 			options.FindOne().SetProjection(bson.D{{"_id", 0}}))
 
 	// check fetching errors
 	if res.Err() != nil {
-		fmt.Printf("unable to fetch item id %s. err: %s", itemId, res.Err().Error())
+		fmt.Printf("unable to fetch item id %s. err: %s", itemID, res.Err().Error())
 		return nil, false
 	}
 
 	// decode data
 	var itemBson interface{}
 	if err := res.Decode(&itemBson); err != nil {
-		fmt.Printf("unable to decode DB data for item id %s. err: %s", itemId, err)
+		fmt.Printf("unable to decode DB data for item id %s. err: %s", itemID, err)
 		return nil, false
 	}
 
@@ -87,6 +93,7 @@ func (msc *MongoCollectionHandler) GetItem(itemId string) (interface{}, bool) {
 	return item, true
 }
 
+//AddItem implements storage.CollectionHandler.AddItem
 func (msc *MongoCollectionHandler) AddItem(item map[string]interface{}) (string, error) {
 	res, err := msc.db.Collection(msc.collection.Name).InsertOne(createContext(), item)
 	if err != nil {
@@ -98,32 +105,36 @@ func (msc *MongoCollectionHandler) AddItem(item map[string]interface{}) (string,
 	return id, nil
 }
 
-func (msc *MongoCollectionHandler) UpdateItem(itemId string, newItem map[string]interface{}) error {
-	objId, _ := primitive.ObjectIDFromHex(itemId)
-	_, err := msc.db.Collection(msc.collection.Name).UpdateOne(createContext(), bson.D{{"_id", objId}}, bson.D{{"$set", newItem}})
+//UpdateItem implements storage.CollectionHandler.UpdateItem
+func (msc *MongoCollectionHandler) UpdateItem(itemID string, newItem map[string]interface{}) error {
+	objID, _ := primitive.ObjectIDFromHex(itemID)
+	_, err := msc.db.Collection(msc.collection.Name).UpdateOne(createContext(), bson.D{{"_id", objID}}, bson.D{{"$set", newItem}})
 	if err != nil {
 		fmt.Printf("unable to update item. err: " + err.Error())
 		return err
 	}
-	log.Debugf("updated item %s.%s", msc.collection.Name, itemId)
+	log.Debugf("updated item %s.%s", msc.collection.Name, itemID)
 	return nil
 }
 
-func (msc *MongoCollectionHandler) DeleteItem(itemId string) error {
-	objId, _ := primitive.ObjectIDFromHex(itemId)
-	_, err := msc.db.Collection(msc.collection.Name).DeleteOne(createContext(), bson.M{"_id": objId})
+//DeleteItem implements storage.CollectionHandler.DeleteItem
+func (msc *MongoCollectionHandler) DeleteItem(itemID string) error {
+	objID, _ := primitive.ObjectIDFromHex(itemID)
+	_, err := msc.db.Collection(msc.collection.Name).DeleteOne(createContext(), bson.M{"_id": objID})
 	if err != nil {
 		fmt.Printf("unable to delete item. err: " + err.Error())
 		return err
 	}
-	log.Debugf("deleted item %s.%s", msc.collection.Name, itemId)
+	log.Debugf("deleted item %s.%s", msc.collection.Name, itemID)
 	return nil
 }
 
-func (msc *MongoCollectionHandler) List(lastItemId string) []interface{} {
+//List implements storage.CollectionHandler.List
+func (msc *MongoCollectionHandler) List(lastItemID string) []interface{} {
 	return nil
 }
 
+//Initialize implements storage.Storage.Initialize
 func (ms *MongoStorage) Initialize(manifest string) {
 	ctx := createContext()
 	uri := fmt.Sprintf("mongodb://%s", ms.host)
@@ -148,10 +159,12 @@ func createContext() context.Context {
 	return ctx
 }
 
+//GetCollectionDefinitions implements storage.Storage.GetCollectionDefinitions
 func (ms *MongoStorage) GetCollectionDefinitions() []data.CollectionDefinition {
 	return ms.collectionsDefinitions
 }
 
+//GetCollection implements storage.Storage.GetCollection
 func (ms *MongoStorage) GetCollection(collectionName string) (CollectionHandler, error) {
 	if collection, ok := ms.collectionsDefinitionsMap[collectionName]; ok {
 		collectionHandler, exists := ms.collectionHandlers[collectionName]

@@ -10,17 +10,20 @@ import (
 
 type collectionData map[string]interface{}
 
+//MemoryStorage structure for the storage using in-memory data (ideal for testing, not for production)
 type MemoryStorage struct {
 	collectionsDefinitions []data.CollectionDefinition
 	dataCollections        map[string]collectionData
 	collectionHandlers     map[string]CollectionHandler
 }
 
+//MemoryCollectionHandler data handler used for a specific collection
 type MemoryCollectionHandler struct {
 	collection collectionData
-	lastId     int64
+	lastID     int64
 }
 
+//NewMemoryStorage create a new MemoryStarage instance
 func NewMemoryStorage() Storage {
 	return &MemoryStorage{
 		dataCollections:    map[string]collectionData{},
@@ -34,51 +37,59 @@ func newMemoryStorageCollectionHandler(collection collectionData) CollectionHand
 	}
 }
 
-func (msc *MemoryCollectionHandler) GetItem(itemId string) (interface{}, bool) {
-	if data, ok := msc.collection[itemId]; ok {
+//GetItem implements storage.CollectionHandler.GetItem
+func (msc *MemoryCollectionHandler) GetItem(itemID string) (interface{}, bool) {
+	if data, ok := msc.collection[itemID]; ok {
 		return data, true
 	}
 	return nil, false
 }
 
+//AddItem implements storage.CollectionHandler.AddItem
 func (msc *MemoryCollectionHandler) AddItem(item map[string]interface{}) (string, error) {
-	msc.lastId++
-	id := strconv.FormatInt(msc.lastId, 16)
+	msc.lastID++
+	id := strconv.FormatInt(msc.lastID, 16)
 	msc.collection[id] = item
 	return id, nil
 }
 
-func (msc *MemoryCollectionHandler) UpdateItem(itemId string, newItem map[string]interface{}) error {
-	_, found := msc.GetItem(itemId)
+//UpdateItem implements storage.CollectionHandler.UpdateItem
+func (msc *MemoryCollectionHandler) UpdateItem(itemID string, newItem map[string]interface{}) error {
+	_, found := msc.GetItem(itemID)
 	if !found {
-		return fmt.Errorf("item '%s' not found", itemId)
+		return fmt.Errorf("item '%s' not found", itemID)
 	}
-	msc.collection[itemId] = newItem
+	msc.collection[itemID] = newItem
 	return nil
 }
 
-func (msc *MemoryCollectionHandler) DeleteItem(itemId string) error {
-	_, found := msc.GetItem(itemId)
+//DeleteItem implements storage.CollectionHandler.DeleteItem
+func (msc *MemoryCollectionHandler) DeleteItem(itemID string) error {
+	_, found := msc.GetItem(itemID)
 	if !found {
-		return fmt.Errorf("item '%s' not found", itemId)
+		return fmt.Errorf("item '%s' not found", itemID)
 	}
-	delete(msc.collection, itemId)
+	delete(msc.collection, itemID)
 	return nil
 }
 
-func (msc *MemoryCollectionHandler) List(lastItemId string) []interface{} {
+//List implements storage.CollectionHandler.List
+func (msc *MemoryCollectionHandler) List(lastItemID string) []interface{} {
 	return nil
 }
 
+//Initialize implements storage.Storage.Initialize
 func (ms *MemoryStorage) Initialize(manifest string) {
 	ms.initializeCollectionDefinitions(manifest)
 	ms.initializeCollections()
 }
 
+//GetCollectionDefinitions implements storage.Storage.GetCollectionDefinitions
 func (ms *MemoryStorage) GetCollectionDefinitions() []data.CollectionDefinition {
 	return ms.collectionsDefinitions
 }
 
+//GetCollection implements storage.Storage.GetCollection
 func (ms *MemoryStorage) GetCollection(collectionName string) (CollectionHandler, error) {
 	if collection, ok := ms.dataCollections[collectionName]; ok {
 		storageCollection, exists := ms.collectionHandlers[collectionName]

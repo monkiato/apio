@@ -38,7 +38,6 @@ func PutHandler(collectionDefinition data.CollectionDefinition) func(http.Respon
 		if id, err := storageCollection.AddItem(item); err != nil {
 			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't add new item")
-			return
 		} else {
 			addSuccessResponse(w, http.StatusCreated, map[string]interface{}{
 				"id": id,
@@ -59,11 +58,11 @@ func PostHandler(collectionDefinition data.CollectionDefinition) func(http.Respo
 			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't update item")
 			return
-		} else {
-			addSuccessResponse(w, http.StatusOK, map[string]interface{}{
-				"id": id,
-			})
 		}
+
+		addSuccessResponse(w, http.StatusOK, map[string]interface{}{
+			"id": id,
+		})
 	}
 }
 
@@ -77,9 +76,9 @@ func DeleteHandler(collectionDefinition data.CollectionDefinition) func(http.Res
 			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't delete item")
 			return
-		} else {
-			w.WriteHeader(http.StatusNoContent)
 		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 

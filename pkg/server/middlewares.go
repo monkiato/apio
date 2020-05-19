@@ -29,11 +29,11 @@ func ParseBody(handler http.HandlerFunc) func(http.ResponseWriter, *http.Request
 	}
 }
 
-// ValidateId middleware used to detect an item ID in the request, if exists it means the endpoint is trying to operate
+// ValidateID middleware used to detect an item ID in the request, if exists it means the endpoint is trying to operate
 // over an existing item, and the middleware will try to find and get the item, otherwise an error is returned if the
 // item was not found. The item will be stored in Gorilla Context, it can be obtained from subsequence handlers through
 // context.Get(r, "item")
-func ValidateId(collection data.CollectionDefinition) mux.MiddlewareFunc {
+func ValidateID(collection data.CollectionDefinition) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			vars := mux.Vars(r)

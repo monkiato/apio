@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	//Storage main and unique storage instance used across the api
 	Storage storage.Storage
 )
 
