@@ -8,4 +8,20 @@
       image: golang:1.13
       commands:
       - go build
-      - go test
+
+    - name: test
+      image: golang:1.13
+      commands:
+        - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+    - name: coverage
+      image: plugins/codecov
+      settings:
+        token: f94217d3-9e6e-4fb7-b725-ff155c1b24bc
+        files:
+          - coverage.txt
+
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/pull/*/head

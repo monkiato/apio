@@ -1,4 +1,5 @@
 [![Build Status](https://drone.monkiato.com/api/badges/monkiato/apio/status.svg?ref=refs/heads/master)](https://drone.monkiato.com/monkiato/apio)
+[![Go Report Card](https://goreportcard.com/badge/github.com/monkiato/apio)](https://goreportcard.com/report/github.com/monkiato/apio)
 
 
 # Apio
