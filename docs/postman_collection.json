@@ -1,0 +1,237 @@
+{
+	"info": {
+		"_postman_id": "c52c1da0-96d3-4d9b-afc0-a7afeda9e560",
+		"name": "Apio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get routes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/routes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"routes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add person",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"testing\",\n\t\"birthday\": 170000000,\n\t\"phone\": \"111-1111\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get person data",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/5ed133692cfd0cda12643d1b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						"5ed133692cfd0cda12643d1b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update persona data",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"testing modified\",\n\t\"birthday\": 170000000,\n\t\"phone\": \"111-1111\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/5ed133692cfd0cda12643d1b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						"5ed133692cfd0cda12643d1b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove person",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/5ed132da2cfd0cda12643d1a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						"5ed132da2cfd0cda12643d1a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List people",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List people with skip arg",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/?skip=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						""
+					],
+					"query": [
+						{
+							"key": "skip",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List people with limit",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/people/?limit=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"people",
+						""
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
