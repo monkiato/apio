@@ -22,6 +22,13 @@ type CollectionHandler interface {
 	UpdateItem(itemID string, item map[string]interface{}) error
 	// DeleteItem remove the specified itemID
 	DeleteItem(itemID string) error
-	// List returns a list of items from a collection, limited by page and amount of items
-	List(lastItemID string) []interface{}
+	// Query returns a list of items from a collection filtered by some criteria declared in QueryParams
+	Query(query QueryParams) ([]interface{}, error)
+}
+
+// QueryParams used to filter data on a query
+type QueryParams struct {
+	Skip   int64
+	Limit  int64
+	SortBy string
 }

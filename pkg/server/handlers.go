@@ -5,7 +5,14 @@ import (
 	"github.com/gorilla/context"
 	log "github.com/sirupsen/logrus"
 	"monkiato/apio/internal/data"
+	"monkiato/apio/internal/storage"
 	"net/http"
+	"strconv"
+)
+
+const (
+	defaultLimit = 20
+	maxLimit     = 100
 )
 
 // GetHandler used to handle GET requests, the collectionDefinition is provided based on the endpoint being called
@@ -86,9 +93,27 @@ func DeleteHandler(collectionDefinition data.CollectionDefinition) func(http.Res
 func ListCollectionHandler(collectionDefinition data.CollectionDefinition) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		queryParams := r.URL.Query()
-		lastValue := queryParams.Get("last")
+		skip, skipErr := strconv.ParseInt(queryParams.Get("skip"), 10, 64)
+		limit, limitErr := strconv.ParseInt(queryParams.Get("limit"), 10, 64)
+		if skipErr != nil || skip < 0 {
+			skip = 0
+		}
+		if limitErr != nil || limit <= 0 {
+			limit = defaultLimit
+		}
+		if limit > maxLimit {
+			limit = maxLimit
+		}
 		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
-		items := storageCollection.List(lastValue)
+		items, err := storageCollection.Query(storage.QueryParams{
+			Skip:  skip,
+			Limit: limit,
+		})
+		if err != nil {
+			log.Error(err.Error())
+			addErrorResponse(w, http.StatusInternalServerError, "unable to obtain items from DB")
+			return
+		}
 		data, err := json.Marshal(items)
 		if err != nil {
 			log.Error(err.Error())

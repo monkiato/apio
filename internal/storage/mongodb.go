@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"monkiato/apio/internal/data"
-	"os"
+	mk_os "monkiato/apio/internal/os"
 	"time"
 )
 
@@ -28,6 +28,8 @@ type MongoStorage struct {
 	client                    *mongo.Client
 	host                      string
 	dbName                    string
+	username                  string
+	password                  string
 }
 
 //MongoCollectionHandler  data handler used for a specific collection
@@ -40,19 +42,21 @@ type MongoCollectionHandler struct {
 //MongoDB connection data con be set by environment variables
 //MONGODB_HOST and MONGODB_NAME
 func NewMongoStorage() Storage {
-	host := defaultMongodbHost
-	dbName := defaultMongodbName
-	if envHost, exists := os.LookupEnv("MONGODB_HOST"); exists {
-		host = envHost
+	username := mk_os.GetEnv("MONGODB_USERNAME", "")
+	if username == "" {
+		log.Fatalf("unable to obtain MongoDB credentials")
 	}
-	if envDbName, exists := os.LookupEnv("MONGODB_NAME"); exists {
-		dbName = envDbName
-	}
+	password := mk_os.GetEnv("MONGODB_PASSWORD", "")
+	host := mk_os.GetEnv("MONGODB_HOST", defaultMongodbHost)
+	dbName := mk_os.GetEnv("MONGODB_NAME", defaultMongodbName)
+
 	return &MongoStorage{
 		collectionHandlers:        map[string]CollectionHandler{},
 		collectionsDefinitionsMap: map[string]data.CollectionDefinition{},
 		host:                      host,
 		dbName:                    dbName,
+		username:                  username,
+		password:                  password,
 	}
 }
 
@@ -98,7 +102,7 @@ func (msc *MongoCollectionHandler) AddItem(item map[string]interface{}) (string,
 	res, err := msc.db.Collection(msc.collection.Name).InsertOne(createContext(), item)
 	if err != nil {
 		fmt.Printf("unable to add new item. err: " + err.Error())
-		return "", nil
+		return "", err
 	}
 	id := res.InsertedID.(primitive.ObjectID).Hex()
 	log.Debugf("created new item %s.%s", msc.collection.Name, id)
@@ -129,9 +133,37 @@ func (msc *MongoCollectionHandler) DeleteItem(itemID string) error {
 	return nil
 }
 
-//List implements storage.CollectionHandler.List
-func (msc *MongoCollectionHandler) List(lastItemID string) []interface{} {
-	return nil
+//Query implements storage.CollectionHandler.Query
+func (msc *MongoCollectionHandler) Query(query QueryParams) ([]interface{}, error) {
+	ctx := createContext()
+	cursor, err := msc.db.Collection(msc.collection.Name).Find(
+		ctx,
+		bson.M{},
+		options.Find().SetSkip(query.Skip).SetLimit(query.Limit),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []interface{}
+
+	for cursor.Next(ctx) {
+		// decode data
+		var itemBson interface{}
+		if err := cursor.Decode(&itemBson); err != nil {
+			fmt.Printf("unable to decode DB data for query results. err: %s", err)
+			return nil, err
+		}
+
+		// convert bson data to go map
+		var item map[string]interface{}
+		b, _ := bson.Marshal(itemBson)
+		bson.Unmarshal(b, &item)
+
+		results = append(results, item)
+	}
+
+	return results, nil
 }
 
 //Initialize implements storage.Storage.Initialize
@@ -140,7 +172,13 @@ func (ms *MongoStorage) Initialize(manifest string) {
 	uri := fmt.Sprintf("mongodb://%s", ms.host)
 
 	log.Debugf("connecting to mongoDB: %s", uri)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+
+	opts := options.Client().ApplyURI(uri)
+	opts.Auth = &options.Credential{
+		Username: ms.username,
+		Password: ms.password,
+	}
+	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		panic("unable to connect to Mongo db. " + uri)
 	}

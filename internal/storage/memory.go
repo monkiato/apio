@@ -73,9 +73,9 @@ func (msc *MemoryCollectionHandler) DeleteItem(itemID string) error {
 	return nil
 }
 
-//List implements storage.CollectionHandler.List
-func (msc *MemoryCollectionHandler) List(lastItemID string) []interface{} {
-	return nil
+//Query implements storage.CollectionHandler.Query
+func (msc *MemoryCollectionHandler) Query(query QueryParams) ([]interface{}, error) {
+	return nil, nil
 }
 
 //Initialize implements storage.Storage.Initialize

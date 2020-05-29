@@ -8,6 +8,8 @@ services:
     environment:
       MONGODB_HOST: "mongodb:27017"
       MONGODB_NAME: apio
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: example
       DEBUG_MODE: 1
     depends_on:
       - mongodb

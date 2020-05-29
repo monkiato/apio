@@ -5,10 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
+	mk_os "monkiato/apio/internal/os"
 	"monkiato/apio/pkg/server"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -18,16 +18,12 @@ func main() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.ErrorLevel)
 
-	if debugMode, found := os.LookupEnv("DEBUG_MODE"); found {
-		if val, _ := strconv.Atoi(debugMode); val == 1 {
-			log.SetLevel(log.DebugLevel)
-		}
+	debugMode := mk_os.GetIntEnv("DEBUG_MODE", 0)
+	if debugMode == 1 {
+		log.SetLevel(log.DebugLevel)
 	}
 
-	port := "80"
-	if customPort, found := os.LookupEnv("SERVER_PORT"); found {
-		port = customPort
-	}
+	port := mk_os.GetEnv("SERVER_PORT", "80")
 
 	server.InitStorage(readManifest())
 
@@ -87,6 +83,6 @@ func addAPIRoutes(router *mux.Router) {
 		apiRoute.HandleFunc("/", server.ParseBody(server.PutHandler(collection))).Methods(http.MethodPut)
 		apiRoute.HandleFunc("/{id}", server.ParseBody(server.PostHandler(collection))).Methods(http.MethodPost)
 		apiRoute.HandleFunc("/{id}", server.DeleteHandler(collection)).Methods(http.MethodDelete)
-		apiRoute.HandleFunc("/list", server.ListCollectionHandler(collection)).Methods(http.MethodGet)
+		apiRoute.HandleFunc("/", server.ListCollectionHandler(collection)).Methods(http.MethodGet)
 	}
 }
