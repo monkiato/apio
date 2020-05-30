@@ -78,6 +78,11 @@ A sample file can be found in *manifest.sample.json*
  - float (any numeric field)
  - bool
  
+## Available Storage Types
+
+ - `mongodb` (default) requires a MongoDB connection, check environment parameters for configuration
+ - `memory` in-memory database, useful for dev environment to prevent external DB connection
+ 
  
 ## Build Docker Image
 
@@ -100,6 +105,7 @@ Custom environment arguments:
     MONGODB_NAME: {db_name}         //default 'apio'
     MANIFEST_PATH: {custom}         //default /app/manifest.json
     DEBUG_MODE: 1                   //default 0, enable verbose logs
+    STORAGE_TYPE: {type}            //default 'mongodb'
 
 A volume mapping is required in order to provide the manifest file:
 

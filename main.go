@@ -24,8 +24,9 @@ func main() {
 	}
 
 	port := mk_os.GetEnv("SERVER_PORT", "80")
+	storageType := mk_os.GetEnv("STORAGE_TYPE", server.StorageTypeMongoDB)
 
-	server.InitStorage(readManifest())
+	server.InitStorage(readManifest(), storageType)
 
 	mainRoute := mux.NewRouter().PathPrefix("/api/").Subrouter()
 	addListRoutesEndpoint(mainRoute)
