@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"monkiato/apio/internal/data"
+	"sort"
 	"strconv"
 )
 
@@ -75,7 +76,26 @@ func (msc *MemoryCollectionHandler) DeleteItem(itemID string) error {
 
 //Query implements storage.CollectionHandler.Query
 func (msc *MemoryCollectionHandler) Query(query QueryParams) ([]interface{}, error) {
-	return nil, nil
+	var items []interface{}
+	var count int64 = 0
+
+	keys := make([]string, 0, len(msc.collection))
+	for k := range msc.collection {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		count++
+		if query.Skip >= count {
+			continue
+		}
+		items = append(items, msc.collection[key])
+		if query.Limit == int64(len(items)) {
+			break
+		}
+	}
+	return items, nil
 }
 
 //Initialize implements storage.Storage.Initialize

@@ -112,9 +112,16 @@ func TestMemoryCollectionHandler_Query(t *testing.T) {
 	handler := &MemoryCollectionHandler{
 		collection: createCollection(),
 	}
+	handler.AddItem(createItem())
+	handler.AddItem(createItem())
+	handler.AddItem(createItem())
+	handler.AddItem(createItem())
 	list, err := handler.Query(QueryParams{})
-	if list != nil || err != nil {
-		t.Fatalf("unexpected values for not implemented method")
+	if err != nil {
+		t.Fatalf("unexpected error: " + err.Error())
+	}
+	if len(list) != 4 {
+		t.Fatalf("unexpected list length")
 	}
 }
 

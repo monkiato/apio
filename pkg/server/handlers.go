@@ -61,6 +61,17 @@ func PostHandler(collectionDefinition data.CollectionDefinition) func(http.Respo
 		newItem := context.Get(r, "parsedBody").(map[string]interface{})
 
 		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
+		if !collectionDefinition.IsDataValid(newItem) {
+			addErrorResponse(w, http.StatusBadRequest, "invalid item data, no matching collection definition")
+			return
+		}
+
+		if _, found := storageCollection.GetItem(id); !found {
+			log.Errorf("item '%s' not found", id)
+			addErrorResponse(w, http.StatusBadRequest, "item not found")
+			return
+		}
+
 		if err := storageCollection.UpdateItem(id, newItem); err != nil {
 			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't update item")
@@ -79,6 +90,13 @@ func DeleteHandler(collectionDefinition data.CollectionDefinition) func(http.Res
 		// handle DELEte for collection
 		id := context.Get(r, "id").(string)
 		storageCollection, _ := Storage.GetCollection(collectionDefinition.Name)
+
+		if _, found := storageCollection.GetItem(id); !found {
+			log.Errorf("item '%s' not found", id)
+			addErrorResponse(w, http.StatusBadRequest, "item not found")
+			return
+		}
+
 		if err := storageCollection.DeleteItem(id); err != nil {
 			log.Error(err.Error())
 			addErrorResponse(w, http.StatusInternalServerError, "can't delete item")
