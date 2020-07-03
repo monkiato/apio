@@ -1,9 +1,11 @@
+<img src="docs/logo.svg" width="30%"/>
+
+# Apio
+
 [![Build Status](https://drone.monkiato.com/api/badges/monkiato/apio/status.svg?ref=refs/heads/master)](https://drone.monkiato.com/monkiato/apio)
 [![codecov](https://codecov.io/gh/monkiato/apio/branch/master/graph/badge.svg)](https://codecov.io/gh/monkiato/apio)
 [![Go Report Card](https://goreportcard.com/badge/github.com/monkiato/apio)](https://goreportcard.com/report/github.com/monkiato/apio)
 
-
-# Apio
 
 A dynamic REST API server, using a manifest file to specify available collections
 
@@ -111,3 +113,7 @@ A volume mapping is required in order to provide the manifest file:
 
     volumes:
       - "{your-local-path}:/app/manifest.json"
+
+# 'Apio' Logo
+
+<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
