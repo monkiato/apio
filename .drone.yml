@@ -24,8 +24,8 @@
     - name: publish
       image: plugins/docker
       settings:
-        repo: docker.pkg.github.com/monkiato/apio/apio
-        registry: docker.pkg.github.com
+        repo: ghcr.io/monkiato/apio
+        registry: ghcr.io
         tags: ${DRONE_TAG}
         username:
           from_secret: docker_username
